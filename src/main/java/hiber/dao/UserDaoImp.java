@@ -1,57 +1,50 @@
 package hiber.dao;
 
-import hiber.model.Car;
 import hiber.model.User;
 import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class UserDaoImp implements UserDao {
 
-   @Autowired
-   private SessionFactory sessionFactory;
+   private final SessionFactory sessionFactory;
+
+   public UserDaoImp(SessionFactory sessionFactory) {
+      this.sessionFactory = sessionFactory;
+   }
 
    @Override
+   @Transactional
    public void add(User user) {
       sessionFactory.getCurrentSession().save(user);
    }
 
-   @Override
    @SuppressWarnings("unchecked")
+   @Override
+   @Transactional(readOnly = true)
    public List<User> listUsers() {
-      TypedQuery<User> query = sessionFactory.getCurrentSession().createQuery("from User");
-      return query.getResultList();
+      return (List<User>) sessionFactory.getCurrentSession().createQuery("FROM User").getResultList();
    }
 
    @Override
-   @SuppressWarnings("unchecked")
+   @Transactional
    public void deleteAllUsers() {
-      List<User> users = listUsers();
-      for (User user : users) {
-         sessionFactory.getCurrentSession().delete(user);
-      }
+      sessionFactory.getCurrentSession().createQuery("DELETE FROM User").executeUpdate();
    }
 
    @Override
-   public User findOwner(String car_name, String car_series) {
-      TypedQuery<Car> findCarQuery = sessionFactory.getCurrentSession()
-              .createQuery("from Car where name = :car_name and series = :car_series", Car.class)
-              .setParameter("car_name", car_name)
-              .setParameter("car_series", car_series);
-      List<Car> findCarList = findCarQuery.getResultList();
-      if (!findCarList.isEmpty()) {
-         Car findCar = findCarList.get(0);
-         List<User> ListUser = listUsers();
-          return ListUser.stream()
-                 .filter(user -> user.getCar().equals(findCar))
-                 .findAny()
-                 .orElse(null);
-      }
-      return null;
+   @Transactional(readOnly = true)
+   public Optional<User> findUserByCarNameAndSeries(String carName, String carSeries) {
+      TypedQuery<User> query = sessionFactory.getCurrentSession().createQuery(
+              "SELECT u FROM User u JOIN FETCH u.car c WHERE c.name = :carName AND c.series = :carSeries",
+              User.class);
+      query.setParameter("carName", carName);
+      query.setParameter("carSeries", carSeries);
+      return query.getResultStream().findFirst();
    }
-
 }

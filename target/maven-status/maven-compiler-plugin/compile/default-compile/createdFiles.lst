@@ -1,0 +1,5 @@
+hiber\service\CarServiceImp.class
+hiber\model\Car.class
+hiber\dao\CarDao.class
+hiber\dao\CarDaoImp.class
+hiber\service\CarService.class
