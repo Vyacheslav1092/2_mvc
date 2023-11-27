@@ -78,10 +78,6 @@ public class User {
       return car;
    }
 
-   public void setCar(){
-      this.car = car;
-   }
-
    @Override
    public String toString() {
       return "firstName: " + firstName + ", " +
