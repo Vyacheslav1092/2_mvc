@@ -12,14 +12,16 @@
             <td>Машины</td>
         </tr>
         <tr>
-            <td align="center">Id</td>
             <td align="center">Model</td>
             <td align="center">Color</td>
+            <td align="center">Year</td>
+            <td align="center">Price</td>
         </tr>
-        <tr th:each="carname : ${carList}">
-            <td th:text="${carname.getId()}" align="center"></td>
+        <tr th:each="carname : ${cars}">
             <td th:text="${carname.getModel()}" align="center"></td>
             <td th:text="${carname.getColor()}" align="center"></td>
+            <td th:text="${carname.getYear()}" align="center"></td>
+            <td th:text="${#numbers.formatDecimal(carname.getPrice(), 0, 'COMMA', 2, 'POINT')}" align="center"></td>
         </tr>
     </tbody>
 </table>

@@ -1,26 +1,22 @@
 package web.controller;
 
-import model.Car;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import web.sevice.CarService;
 
-import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class CarController {
     @Autowired
-    List<Car> carList;
+    private CarService carService;
 
     @GetMapping(value = "/cars")
-    public String printCar(@RequestParam(value = "count", defaultValue = "5") int count, ModelMap model) {
-        List<Car> subCarList = carList;
-        if (count < carList.size()) {
-            subCarList = carList.subList(0, count);
-        }
-        model.addAttribute("carList", subCarList);
+    public String showCars(@RequestParam(value = "count") Optional<Integer> count, Model model) {
+        model.addAttribute("cars", carService.getCars(count.orElse(0)));
         return "cars";
     }
 }
